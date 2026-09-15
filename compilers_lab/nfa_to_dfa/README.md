@@ -4,13 +4,12 @@ Práctica 2 de Compiladores. Convierte un NFA en un DFA mediante la construcció
 
 ## Estado
 
-| Componente | Estado | Archivos |
-|---|---|---|
-| Conjuntos de estados | Hecho | `src/set.c/h` |
-| Algoritmo Move | Hecho | `src/move.c/h` |
-| Cierre epsilon | Pendiente | |
-| Construcción de subconjuntos | Pendiente | |
-| Programa principal | Pendiente | |
+| Componente                   | Estado    | Archivos       |
+| ---------------------------- | --------- | -------------- |
+| Conjuntos de estados         | Hecho     | `src/set.c/h`  |
+| Algoritmo Move               | Hecho     | `src/move.c/h` |
+| e-closure                    | Pendiente |                |
+| Construcción de subconjuntos | Pendiente |                |
 
 La representación base está en `src/nfa.h`. Las transiciones se guardan como tercias con estado origen, símbolo y estado destino, y el símbolo 0 se reserva para epsilon. Los conjuntos de estados son arreglos de banderas, así que agregar y consultar un estado cuesta tiempo constante y la unión no duplica.
 
@@ -18,7 +17,7 @@ La representación base está en `src/nfa.h`. Las transiciones se guardan como t
 
 ## Pruebas
 
-Cada componente tiene su ejecutable de pruebas en `tests/`, integrado con CTest. Incluyen el vector del enunciado, con `Move({0}, 'a')` regresando `{1, 2}`.
+Cada componente tiene su ejecutable de pruebas en `tests/`, integrado con CTest.
 
 ```bash
 cmake -S . -B build && make -C build && ctest --test-dir build --output-on-failure
