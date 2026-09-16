@@ -9,6 +9,12 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 enable_testing()
 
+# Pruebas de Move
 add_executable(test_move tests/test_move.c src/move.c src/set.c)
 target_include_directories(test_move PRIVATE src)
 add_test(NAME move COMMAND test_move)
+
+# Pruebas de Epsilon-Closure
+add_executable(test_ec tests/test_ec.c src/ec.c src/set.c)
+target_include_directories(test_ec PRIVATE src)
+add_test(NAME e_closure COMMAND test_ec)
