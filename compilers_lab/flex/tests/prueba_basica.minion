@@ -1,0 +1,22 @@
+story minionAdventure {
+    banana int bananas = 3;
+    gelato int maxBananas = 10;
+
+    scene aventura() {
+        bello("Bello!");
+
+        papoy (bananas > 0) {
+            bananas++;
+        }
+
+        bee-do {
+            bananas--;
+        }
+
+        poopaye (bananas < maxBananas) {
+            bananas += 1;
+        }
+
+        gru;
+    }
+}

@@ -1,0 +1,22 @@
+story test {
+    banana float x = 2.5;
+    banana string s = "Bello";
+    banana char c = 'a';
+
+    tatata (x = 0; x <= 5; x++) { dave; }
+    para-tu (x) { kevin; }
+
+    papoy (x >= 1 && x != 3 || !x) { x -= 1; }
+
+    x *= 2;
+    x /= 2;
+    x %= 2;
+
+    x = x << 1;
+    x = x >> 1;
+    x = x & 1;
+    x = x | 1;
+
+    // comentario
+    /* comentario multilinea */
+}
