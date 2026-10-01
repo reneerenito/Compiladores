@@ -19,19 +19,19 @@ Se utilizan palabras reservadas con temática de Minions para representar constr
 
 | Palabra | Equivalente |
 | ------- | ----------- |
-| `story` | programa principal |
-| `scene` | definición de función |
+| `storia` | programa principal |
+| `filma` | definición de función |
 | `banana` | variable |
 | `gelato` | constante |
 | `bello` | print |
-| `papoy` | if |
-| `bee-do` | else |
-| `poopaye` | while |
-| `tatata` | for |
-| `para-tu` | foreach |
-| `gru` | return |
-| `kevin` | break |
-| `dave` | continue |
+| `para_tu` | if |
+| `bi_do` | else |
+| `stupa` | while |
+| `hana_dul_sae` | for |
+| `luk_at_tu` | foreach |
+| `papoi` | return |
+| `poopaye` | break |
+| `pwde_na` | continue |
 
 Los tipos `int`, `float`, `string` y `char`, así como los operadores y delimitadores, conservan su sintaxis convencional.
 

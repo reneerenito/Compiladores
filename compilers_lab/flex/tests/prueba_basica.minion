@@ -1,22 +1,42 @@
-story minionAdventure {
-    banana int bananas = 3;
-    gelato int maxBananas = 10;
+storia minionAdventure { 
+ 
+    banana int bananas = 3; 
+    gelato int maxBananas = 10; 
+    banana string lugar = "castillo"; 
+    banana char inicial = 'M'; 
+ 
+    filma aventura() { 
+ 
+        bello("Bello! Los Minions llegaron al castillo."); 
+ 
+        para_tu (bananas > 0) { 
+            bello("Los Minions encontraron bananas."); 
 
-    scene aventura() {
-        bello("Bello!");
+            para_tu (bananas == 2) {
+                pwde_na;
+            }
 
-        papoy (bananas > 0) {
-            bananas++;
+            bananas--; 
+        } 
+ 
+        bi_do { 
+            bello("Poopaye! No hay bananas."); 
+        } 
+ 
+        stupa (bananas < maxBananas) { 
+            bello("Los Minions buscan mas bananas."); 
+
+            para_tu (bananas == 8) {
+                poopaye;
+            }
+
+            bananas++; 
+        } 
+
+        luk_at_tu (bananas) {
+            bello("Los Minions encontraron otra banana."); 
         }
 
-        bee-do {
-            bananas--;
-        }
-
-        poopaye (bananas < maxBananas) {
-            bananas += 1;
-        }
-
-        gru;
-    }
+        papoi; 
+    } 
 }

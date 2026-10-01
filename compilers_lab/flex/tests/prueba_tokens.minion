@@ -1,22 +1,46 @@
-story test {
-    banana float x = 2.5;
-    banana string s = "Bello";
-    banana char c = 'a';
+storia bananaMission { 
+ 
+    banana float bananas = 2.5; 
+    banana string mensaje = "Bello"; 
+    banana char inicial = 'M'; 
+ 
+    hana_dul_sae (bananas = 0; bananas <= 5; bananas++) { 
+        bello("Los Minions buscan bananas."); 
+    } 
+ 
+    para_tu (bananas > 0) { 
+        bello("Los Minions encontraron bananas."); 
+    } 
+ 
+    papoi (bananas >= 1 && bananas != 3 || !bananas) { 
+        bananas -= 1; 
+    } 
+ 
+    bananas *= 2; 
+    bananas /= 2; 
+    bananas %= 2; 
+ 
+    bananas = bananas << 1; 
+    bananas = bananas >> 1; 
+    bananas = bananas & 1; 
+    bananas = bananas | 1; 
 
-    tatata (x = 0; x <= 5; x++) { dave; }
-    para-tu (x) { kevin; }
+    bananas = bananas + 1;
+    bananas = bananas - 1;
+    bananas = bananas * 2;
+    bananas = bananas / 2;
+    bananas = bananas % 2;
 
-    papoy (x >= 1 && x != 3 || !x) { x -= 1; }
+    bananas = bananas < 5;
+    bananas = bananas > 2;
+    bananas = bananas == 3;
+    bananas = bananas != 4;
+    bananas = bananas <= 5;
+    bananas = bananas >= 2;
 
-    x *= 2;
-    x /= 2;
-    x %= 2;
+    bananas++;
+    bananas--;
 
-    x = x << 1;
-    x = x >> 1;
-    x = x & 1;
-    x = x | 1;
+    [bananas, 1];
 
-    // comentario
-    /* comentario multilinea */
 }

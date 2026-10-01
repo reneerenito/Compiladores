@@ -19,12 +19,12 @@ WS          [ \t\r\n]+
 <COMMENT>.              { /* descartar contenido de comentario */ }
 <COMMENT><<EOF>>        { return TOK_ERROR; }
 
-"//"[^\n]*             { /* comentario de línea */ }
+"//"[^\n]*              { /* comentario de línea */ }
 
 {WS}                    { /* ignorar espacios */ }
 
-"story"                 { return TOK_KW_STORY; }
-"scene"                 { return TOK_KW_DEF; }
+"storia"                 { return TOK_KW_STORY; }
+"filma"                 { return TOK_KW_DEF; }
 
 "banana"                { return TOK_KW_VAR; }
 "gelato"                { return TOK_KW_CONST; }
@@ -34,14 +34,14 @@ WS          [ \t\r\n]+
 "string"                { return TOK_KW_STRING; }
 "char"                  { return TOK_KW_CHAR; }
 
-"papoy"                 { return TOK_KW_IF; }
-"bee-do"                { return TOK_KW_ELSE; }
-"poopaye"               { return TOK_KW_WHILE; }
-"tatata"                { return TOK_KW_FOR; }
-"para-tu"               { return TOK_KW_FOREACH; }
-"gru"                   { return TOK_KW_RETURN; }
-"kevin"                 { return TOK_KW_BREAK; }
-"dave"                  { return TOK_KW_CONTINUE; }
+"para_tu"               { return TOK_KW_IF; }
+"bi_do"                 { return TOK_KW_ELSE; }
+"stupa"                 { return TOK_KW_WHILE; }
+"hana_dul_sae"          { return TOK_KW_FOR; }
+"luk_at_tu"             { return TOK_KW_FOREACH; }
+"papoi"                 { return TOK_KW_RETURN; }
+"poopaye"               { return TOK_KW_BREAK; }
+"pwde_na"               { return TOK_KW_CONTINUE; }
 
 "bello"                 { return TOK_KW_PRINT; }
 
@@ -62,8 +62,8 @@ WS          [ \t\r\n]+
 
 "<<"                    { return TOK_SHL; }
 ">>"                    { return TOK_SHR; }
-"&"                    { return TOK_BIT_AND; }
-"|"                    { return TOK_BIT_OR; }
+"&"                     { return TOK_BIT_AND; }
+"|"                     { return TOK_BIT_OR; }
 
 "="                     { return TOK_ASSIGN; }
 "<"                     { return TOK_LT; }
@@ -86,8 +86,8 @@ WS          [ \t\r\n]+
 
 {FLOAT}                 { return TOK_FLOAT_LITERAL; }
 {INT}                   { return TOK_INT_LITERAL; }
-\'([^\\\n]|\\.)\'    { return TOK_CHAR_LITERAL; }
-\"([^\\\n]|\\.)*\"  { return TOK_STRING_LITERAL; }
+\'([^\\\n]|\\.)\'       { return TOK_CHAR_LITERAL; }
+\"([^\\\n]|\\.)*\"      { return TOK_STRING_LITERAL; }
 {ID}                    { return TOK_IDENTIFIER; }
 
 <<EOF>>                 { return TOK_EOF; }
