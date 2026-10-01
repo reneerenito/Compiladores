@@ -1,0 +1,25 @@
+// Casos limite del analizador lexico de Minion
+/* Comentario de bloque
+   que ocupa varias lineas: storia banana bello
+   y no debe producir tokens */
+storia casosLimite {
+    banana int bananas = 0; // comentario al final de la linea
+    banana float ciencia = 1.5e-3;
+    banana float entero_flot = 3.;
+    banana string con_escapes = "Dijo \"Bello\"\tal jefe\n";
+    banana string falsos = "esto /* no */ es comentario // ni esto";
+    banana char comilla = '\'';
+
+    bananas = bananas+++1;
+    bananas += 1;
+    bananas = bananas >> 2 << 1;
+    bananas = bananas > 2 >= 1;
+    bananas = bananas &&& 1 ||| 0;
+
+    banana int bananas2 = 5;
+    banana int integer = 7;
+    para_tuyo = 1;
+
+    bello("primera", "segunda");
+    papoi;
+}

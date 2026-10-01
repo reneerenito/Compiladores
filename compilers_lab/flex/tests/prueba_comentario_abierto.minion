@@ -1,0 +1,4 @@
+storia abierto {
+    bello("hola");
+    /* este comentario nunca se cierra
+    banana int x = 1;

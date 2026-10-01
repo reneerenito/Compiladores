@@ -1,0 +1,401 @@
+\documentclass[11pt,letterpaper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[spanish,es-tabla,es-nodecimaldot,es-noshorthands,es-nolists]{babel}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+
+\captionsetup{labelsep=colon,font=small}
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+\setlength{\emergencystretch}{2em}
+\renewcommand{\labelitemi}{$\blacksquare$}
+
+% ---------------- Estilos de código ----------------
+\definecolor{codebg}{RGB}{247,247,247}
+\definecolor{codeframe}{RGB}{200,200,200}
+\definecolor{kw}{RGB}{0,0,150}
+\definecolor{cmt}{RGB}{0,120,0}
+\definecolor{termbg}{RGB}{40,42,46}
+\definecolor{termfg}{RGB}{225,225,225}
+
+\lstdefinelanguage{flex}{
+  morekeywords={BEGIN,INITIAL,return},
+  morecomment=[s]{/*}{*/},
+  sensitive=true
+}
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{codebg},
+  frame=single, rulecolor=\color{codeframe},
+  keywordstyle=\color{kw}\bfseries,
+  commentstyle=\color{cmt}\itshape,
+  columns=fullflexible, keepspaces=true,
+  showstringspaces=false, breaklines=true,
+  aboveskip=0.7em, belowskip=0.7em,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1
+}
+\lstdefinestyle{terminal}{
+  language={}, backgroundcolor=\color{termbg},
+  basicstyle=\ttfamily\footnotesize\color{termfg},
+  rulecolor=\color{termbg}, keywordstyle={}, commentstyle={}
+}
+\renewcommand{\lstlistingname}{Código}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% ---------------- Espacio para capturas ----------------
+% Si figuras/<archivo> existe se inserta; si no, se dibuja un recuadro
+% indicando qué captura va ahí.
+\graphicspath{{figuras/}}
+\newcommand{\captura}[4]{%
+  \begin{figure}[H]
+    \centering
+    \IfFileExists{figuras/#1}{%
+      \includegraphics[width=0.85\textwidth]{#1}%
+    }{%
+      \fbox{\parbox[c][5cm][c]{0.82\textwidth}{\centering
+        \textbf{CAPTURA PENDIENTE}\\[0.5em]
+        \small #2\\[0.5em]
+        \footnotesize\ttfamily (figuras/\detokenize{#1})}}%
+    }
+    \caption{#3}
+    \label{#4}
+  \end{figure}
+}
+
+% ---------------- Tabla de evaluación ----------------
+% Argumentos 2 a 7: una marca por fila, de la forma {*}{}{}{}{} (col. 1 a 5)
+\newcommand{\fila}[6]{#1 & #2 & #3 & #4 & #5 & #6 \\ \hline}
+\newcommand{\evaluacion}[7]{%
+  \noindent\begin{minipage}{\textwidth}
+  \textbf{#1}\par\smallskip
+  \begin{tabular}{|p{0.62\textwidth}|c|c|c|c|c|}
+    \hline
+    \textbf{Criterio / Afirmación} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4} & \textbf{5}\\ \hline
+    \fila{Los conceptos y habilidades desarrollados en esta práctica son relevantes para mi formación profesional.}#2
+    \fila{El trabajo realizado me permitió comprender de forma práctica la teoría revisada en clase.}#3
+    \fila{Las actividades y problemáticas planteadas durante la sesión resultaron atractivas y motivadoras.}#4
+    \fila{El enfoque práctico y los retos propuestos captaron mi interés a lo largo del desarrollo.}#5
+    \fila{El nivel de complejidad técnica fue adecuado respecto a los conocimientos y recursos previos disponibles.}#6
+    \fila{La claridad de la guía permitió realizar la práctica de manera fluida y sin bloqueos innecesarios.}#7
+  \end{tabular}
+  \end{minipage}\par\bigskip
+}
+
+% ==================================================================
+\begin{document}
+
+\begin{titlepage}
+  \centering
+  \vspace*{2cm}
+  {\large UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO}\\[0.4em]
+  {\large FACULTAD DE CIENCIAS}\\[0.4em]
+  {\large Compiladores}
+
+  \vspace{0.8cm}
+  \rule{\textwidth}{0.4pt}\\[0.4em]
+  {\Large\bfseries Práctica 4: Flex}\\[0.2em]
+  {\normalsize Fast lexical analyzer generator}\\[0.1em]
+  \rule{\textwidth}{0.4pt}
+
+  \vspace{0.8cm}
+  {\small\bfseries PROFESOR}\\[0.4em]
+  Víctor Germán Mijangos de la Cruz
+
+  \vspace{0.6cm}
+  {\small\bfseries AYUDANTES}\\[0.4em]
+  Alejandro Espino Gutiérrez\\
+  Itzel Paola Flores Carrillo\\
+  Adrián Martínez Manzo
+
+  \vspace{0.6cm}
+  {\small\bfseries ALUMNOS}\\[0.4em]
+  Bravo Orozco Diego - 320222904\\
+  López Rodríguez Leslie Renée - 321171915\\
+  Raya García Marco Antonio - 422073121\\
+  Reyes Colín Luis Manuel - 321090474\\
+  Sautto Ramírez Seldon - 321084163
+
+  \vspace{0.8cm}
+  {\small\bfseries GRUPO 7008}\\[0.2em]
+  {\small 30 de Septiembre de 2026}
+\end{titlepage}
+
+\tableofcontents
+\newpage
+
+% ==================================================================
+\section{Estrategia de diseño léxico y condiciones de inicio}
+
+\subsection{Lenguaje modelado}
+
+El lenguaje Minion conserva la estructura léxica de C (llaves, \code{;}, operadores convencionales) y sustituye las palabras clave por vocabulario de los Minions. Los tipos, operadores y delimitadores mantienen su forma tradicional.
+
+\begin{table}[H]
+\centering\footnotesize
+\begin{tabular}{lll}
+\toprule
+\textbf{Lexema} & \textbf{Token} & \textbf{Equivalente} \\
+\midrule
+\code{storia} / \code{filma} & \code{KW\_STORY} / \code{KW\_DEF} & programa / definición de función \\
+\code{banana} / \code{gelato} & \code{KW\_VAR} / \code{KW\_CONST} & variable / constante \\
+\code{int}, \code{float}, \code{string}, \code{char} & \code{KW\_INT}, \dots, \code{KW\_CHAR} & tipos de datos \\
+\code{para\_tu} / \code{bi\_do} & \code{KW\_IF} / \code{KW\_ELSE} & \code{if} / \code{else} \\
+\code{stupa} / \code{hana\_dul\_sae} & \code{KW\_WHILE} / \code{KW\_FOR} & \code{while} / \code{for} \\
+\code{luk\_at\_tu} & \code{KW\_FOREACH} & \code{foreach} \\
+\code{papoi} & \code{KW\_RETURN} & \code{return} \\
+\code{poopaye} / \code{pwde\_na} & \code{KW\_BREAK} / \code{KW\_CONTINUE} & \code{break} / \code{continue} \\
+\code{bello} & \code{KW\_PRINT} & función nativa \code{print} \\
+\bottomrule
+\end{tabular}
+\caption{Palabras reservadas del lenguaje Minion.}
+\end{table}
+
+Una declaración tiene la forma \code{banana int bananas = 3;}: la palabra de declaración y el tipo son tokens independientes y la validación de su combinación se deja al parser. Las palabras con guion bajo (\code{para\_tu}, \code{hana\_dul\_sae}, \dots) se reconocen como un solo lexema porque \code{\_} pertenece al alfabeto de identificadores.
+
+\subsection{Organización de los archivos}
+
+\begin{itemize}
+  \item \code{scanner.h}: \code{enum ScannerToken} con \code{TOK\_EOF = 0} (lo que \code{yylex} devuelve al terminar) y \code{TOK\_ERROR = 256}; el resto toma valores desde 257, dejando libre el rango 1--255 que Bison usa para tokens de un carácter.
+  \item \code{scanner.l}: sólo definiciones y reglas; cada acción se limita a \code{return TOK\_...}.
+  \item \code{scanner.c}: el \code{main} llama a \code{yylex} hasta recibir \code{TOK\_EOF} e imprime \code{[TOKEN:LEXEMA]} con \code{scanner\_token\_name} y \code{yytext}.
+\end{itemize}
+
+\begin{lstlisting}[language=flex,caption={Opciones, condición de inicio y definiciones regulares.}]
+%option noyywrap yylineno
+%x COMMENT
+
+ID          [a-zA-Z_][a-zA-Z0-9_]*
+INT         [0-9]+
+FLOAT       ({INT}\.[0-9]*([eE][+-]?{INT})?|{INT}[eE][+-]?{INT})
+WS          [ \t\r\n]+
+\end{lstlisting}
+
+\code{noyywrap} indica que hay una sola entrada y \code{yylineno} mantiene el número de línea. \code{FLOAT} acepta punto decimal con exponente opcional (\code{2.5}, \code{3.}, \code{1.5e-3}) o exponente sin punto (\code{1e5}). \code{WS} incluye \code{\textbackslash r} para aceptar archivos con finales de línea CRLF.
+
+\subsection{Orden de las reglas}
+
+Flex elige la regla con el lexema \emph{más largo} y, si hay empate, la que aparece \emph{primero}. El archivo se ordenó así:
+
+\begin{enumerate}[label=\arabic*.]
+  \item \textbf{Comentarios primero.} \code{"/*"} (2 caracteres) le gana a \code{"/"} por longitud, y su posición documenta que tienen prioridad sobre cualquier otro uso de \code{/}.
+  \item \textbf{Palabras reservadas antes que \code{\{ID\}}.} Para \code{banana} ambas reglas empatan en longitud y gana la reservada (\code{KW\_VAR}); para \code{bananas}, \code{\{ID\}} reconoce un carácter más y gana (\code{IDENTIFIER}). Si \code{\{ID\}} estuviera antes, ninguna palabra reservada se reconocería.
+  \item \textbf{Operadores compuestos antes que simples} (\code{>{}>}, \code{>=} antes que \code{>}). El longest match ya los resuelve, pero el orden refleja la prioridad real.
+  \item \textbf{\code{\{FLOAT\}} antes que \code{\{INT\}}}, para preferir la interpretación más específica.
+  \item \textbf{Cadena cerrada antes que cadena sin cerrar}; la válida siempre reconoce un carácter más.
+  \item \textbf{\code{.} al final} como comodín de errores: sólo aplica cuando nada más avanza y siempre consume un carácter, evitando el \code{ECHO} por defecto de Flex.
+\end{enumerate}
+
+\begin{lstlisting}[language=flex,caption={Literales, identificadores y comodín de error.}]
+{FLOAT}                 { return TOK_FLOAT_LITERAL; }
+{INT}                   { return TOK_INT_LITERAL; }
+\'([^'\\\n]|\\.)\'      { return TOK_CHAR_LITERAL; }
+\"([^"\\\n]|\\.)*\"     { return TOK_STRING_LITERAL; }
+\"([^"\\\n]|\\.)*       { return TOK_ERROR; /* cadena sin cerrar */ }
+{ID}                    { return TOK_IDENTIFIER; }
+<<EOF>>                 { return TOK_EOF; }
+.                       { return TOK_ERROR; }
+\end{lstlisting}
+
+\subsection{Condición de inicio para comentarios multilínea}
+
+Se usa la condición exclusiva \code{\%x COMMENT}: con \code{\%s} (inclusiva) las reglas de \code{INITIAL} seguirían activas y una palabra como \code{banana} dentro del comentario se reconocería como token.
+
+\begin{lstlisting}[language=flex,caption={Reglas del estado \code{COMMENT}.}]
+"/*"                    { BEGIN(COMMENT); }
+<COMMENT>"*/"           { BEGIN(INITIAL); }
+<COMMENT>\n             { /* yylineno se actualiza automáticamente */ }
+<COMMENT>.              { /* descartar contenido de comentario */ }
+<COMMENT><<EOF>>        { BEGIN(INITIAL); return TOK_ERROR; }
+\end{lstlisting}
+
+\code{<COMMENT>\textbackslash n} y \code{<COMMENT>.} juntas cubren todos los caracteres, de modo que dentro del comentario siempre se consume algo. Con \code{**/}, el primer \code{*} lo consume \code{.} y después \code{"*/"} cierra. El fin de archivo dentro del comentario se reporta como error y regresa a \code{INITIAL}. Los comentarios de línea no necesitan estado: \code{"//"[\^{}\textbackslash n]*} los consume en una sola coincidencia.
+
+\subsection{Cadenas, caracteres y escapes}
+
+Las cadenas usan una sola expresión regular en lugar de un estado, porque el lexema se conserva tal como aparece en el fuente, sin decodificar. El cuerpo admite cualquier carácter excepto comilla, \code{\textbackslash} o salto de línea, o bien una secuencia \code{\textbackslash.}. Así \code{\textbackslash"} se consume como escape y no cierra la cadena. El literal de carácter usa el mismo cuerpo sin repetición (\code{'M'}, \code{'\textbackslash n'}, \code{'\textbackslash''}).
+
+Los errores léxicos se reportan como \code{[ERROR:lexema]} en tres casos: un carácter fuera del alfabeto, una cadena sin cerrar al fin de línea y un comentario sin cerrar al fin de archivo. En todos el análisis continúa.
+
+% ==================================================================
+\section{Instrucciones de compilación y ejecución de pruebas}
+
+Desde el directorio \code{src/} (Flex 2.6.4 y \code{gcc}):
+
+\begin{lstlisting}[language=bash,keywordstyle={}]
+flex scanner.l                      # genera lex.yy.c
+gcc lex.yy.c scanner.c -o scanner
+
+./scanner < ../tests/prueba_basica.minion
+./scanner < ../tests/prueba_tokens.minion
+./scanner < ../tests/prueba_errores.minion
+./scanner < ../tests/prueba_casos_limite.minion
+./scanner < ../tests/prueba_comentario_abierto.minion
+\end{lstlisting}
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l p{6.8cm} c c}
+\toprule
+\textbf{Archivo} & \textbf{Qué valida} & \textbf{Tokens} & \textbf{Errores}\\
+\midrule
+\code{prueba\_basica} & Programa completo: declaraciones, todas las estructuras de control, \code{bello}. & 112 & 0\\
+\code{prueba\_tokens} & Literales y todos los operadores aritméticos, compuestos, relacionales, lógicos y de bits. & 188 & 0\\
+\code{prueba\_errores} & \code{@}, \code{\#}, \code{?} y cadena sin cerrar. & 27 & 4\\
+\code{prueba\_casos\_limite} & Comentarios, notación científica, escapes, \code{+++}, \code{\&\&\&}, \code{+=}, dos cadenas en una línea. & 102 & 0\\
+\code{prueba\_comentario\_abierto} & Comentario de bloque sin cerrar. & 9 & 1\\
+\bottomrule
+\end{tabular}
+\caption{Suite de pruebas. Entre todas se emiten los 56 tipos de token del lenguaje más \code{ERROR}.}
+\end{table}
+
+\subsection{Evidencia}
+
+Primeras líneas de \code{prueba\_basica.minion} (\code{banana} es \code{KW\_VAR} y \code{bananas} es \code{IDENTIFIER}):
+
+\begin{lstlisting}[style=terminal]
+storia minionAdventure {      ->  [KW_STORY:storia] [IDENTIFIER:minionAdventure] [LBRACE:{]
+  banana int bananas = 3;     ->  [KW_VAR:banana] [KW_INT:int] [IDENTIFIER:bananas]
+                                  [ASSIGN:=] [INT_LITERAL:3] [SEMICOLON:;]
+  gelato int maxBananas = 10; ->  [KW_CONST:gelato] [KW_INT:int] [IDENTIFIER:maxBananas]
+                                  [ASSIGN:=] [INT_LITERAL:10] [SEMICOLON:;]
+\end{lstlisting}
+
+\captura{prueba_basica.png}{Salida de \texttt{./scanner < ../tests/prueba\_basica.minion} donde se vean KW\_DEF, KW\_IF, KW\_ELSE, KW\_WHILE, KW\_FOREACH, KW\_BREAK, KW\_CONTINUE y KW\_RETURN.}{Ejecución de \code{prueba\_basica.minion}.}{fig:basica}
+
+\captura{prueba_tokens.png}{Salida de \texttt{./scanner < ../tests/prueba\_tokens.minion} con FLOAT\_LITERAL, KW\_FOR, asignaciones compuestas y SHL/SHR/BIT\_AND/BIT\_OR.}{Ejecución de \code{prueba\_tokens.minion}: literales y operadores.}{fig:tokens}
+
+Errores léxicos en \code{prueba\_errores.minion}:
+
+\begin{lstlisting}[style=terminal]
+x = x @ 2;                  ->  [IDENTIFIER:x] [ERROR:@] [INT_LITERAL:2]
+x = x # 3;                  ->  [IDENTIFIER:x] [ERROR:#] [INT_LITERAL:3]
+x = x ? 4;                  ->  [IDENTIFIER:x] [ERROR:?] [INT_LITERAL:4]
+bello("cadena sin cerrar);  ->  [KW_PRINT:bello] [LPAREN:(] [ERROR:"cadena sin cerrar);]
+\end{lstlisting}
+
+\captura{prueba_errores.png}{Salida completa de \texttt{./scanner < ../tests/prueba\_errores.minion} con los cuatro ERROR.}{Ejecución de \code{prueba\_errores.minion}.}{fig:errores}
+
+\captura{prueba_casos_limite.png}{Salida de \texttt{./scanner < ../tests/prueba\_casos\_limite.minion}: empieza en KW\_STORY (los comentarios no generan tokens), cadenas con escapes, \texttt{+++} y las dos cadenas separadas.}{Ejecución de \code{prueba\_casos\_limite.minion}.}{fig:limite}
+
+\captura{comentario_abierto.png}{Salida de \texttt{./scanner < ../tests/prueba\_comentario\_abierto.minion}: termina con un solo [ERROR:] y regresa el prompt.}{Comentario sin cerrar: un error y el scanner termina.}{fig:abierto}
+
+% ==================================================================
+\section{Bitácora de casos límite y depuración léxica}
+
+\subsection{Longest match en operadores compuestos}
+
+Con operadores que son prefijos de otros (\code{>}, \code{>=}, \code{>{}>}; \code{+}, \code{++}, \code{+=}; \code{\&}, \code{\&\&}), Flex elige la versión compuesta sin \emph{lookahead} manual:
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{l l p{6.5cm}}
+\toprule
+\textbf{Entrada} & \textbf{Tokens} & \textbf{Explicación}\\
+\midrule
+\code{a+++b} & \code{ID INC PLUS ID} & Primero \code{++} (el más largo); el tercer \code{+} queda solo. \\
+\code{\&\&\&} / \code{|||} & \code{AND BIT\_AND} / \code{OR BIT\_OR} & Mismo principio. \\
+\code{a>{}>2<{}<1} & \code{ID SHR INT SHL INT} & \code{>{}>} y \code{<{}<} ganan a \code{>} y \code{<}. \\
+\code{a<{}<=b} & \code{ID SHL ASSIGN ID} & No existe \code{<{}<=}; desde \code{<} lo más largo es \code{<{}<}. \\
+\bottomrule
+\end{tabular}
+\caption{Secuencias de operadores ambiguas.}
+\end{table}
+
+También se verificó que \code{bananas}, \code{para\_tuyo} e \code{integer} son \code{IDENTIFIER} (no se reconoce la palabra reservada por prefijo) y que \code{Storia} también lo es, pues las palabras reservadas distinguen mayúsculas.
+
+\subsection{Varias cadenas en una línea se fusionaban}
+
+\textbf{Problema.} La regla original no excluía la comilla del cuerpo de la cadena:
+\begin{lstlisting}[language=flex]
+\"([^\\\n]|\\.)*\"      { return TOK_STRING_LITERAL; }
+\end{lstlisting}
+Por longest match, la cadena se extendía hasta la última comilla de la línea:
+
+\begin{lstlisting}[style=terminal]
+bello("primera", "segunda");  ->  [STRING_LITERAL:"primera", "segunda"]
+\end{lstlisting}
+
+Las pruebas originales no lo detectaban porque ninguna línea tenía dos cadenas. Los \code{char} tenían el mismo defecto.
+
+\textbf{Solución.} Se agregó la comilla a la clase negada: \code{[\^{}"\textbackslash\textbackslash\textbackslash n]} para cadenas y \code{[\^{}'\textbackslash\textbackslash\textbackslash n]} para caracteres. La comilla escapada se sigue aceptando mediante \code{\textbackslash\textbackslash.}.
+
+\captura{bug_cadenas.png}{Antes y después: \texttt{printf 'bello("a", "b");' | ./scanner} con la regla original (un solo STRING\_LITERAL) y con la corregida (dos cadenas y COMMA).}{Fusión de cadenas antes y después de la corrección.}{fig:fusion}
+
+\subsection{Salto de línea y cadenas sin cerrar}
+
+Las cadenas no pueden abarcar varias líneas, por eso \code{\textbackslash n} está excluido del cuerpo. Sin una regla específica, una cadena sin cerrar dejaba la comilla en el comodín \code{.} y el resto se tokenizaba como código (\code{[ERROR:"] [IDENTIFIER:cadena] [IDENTIFIER:sin]} \dots), generando tokens falsos. Se agregó la regla \code{\textbackslash"([\^{}"\textbackslash\textbackslash\textbackslash n]|\textbackslash\textbackslash.)*}, que se detiene antes del salto de línea y reporta el resto de la línea como un solo error. Cuando la cadena sí cierra, la regla válida reconoce un carácter más y gana.
+
+\subsection{Ciclo infinito al no salir del estado exclusivo}
+
+\textbf{Problema.} La regla original era \code{<COMMENT><{}<EOF>{}> \{ return TOK\_ERROR; \}}. Al devolver el error, el scanner seguía en \code{COMMENT}; la siguiente llamada a \code{yylex} volvía a encontrar el fin de archivo en ese estado y devolvía otro error, sin llegar nunca a \code{TOK\_EOF}. Con la entrada \code{x /* sin cerrar}, en dos segundos se imprimieron más de 3.8 millones de líneas \code{[ERROR:]}.
+
+\textbf{Solución.} Agregar \code{BEGIN(INITIAL);} antes del \code{return}. En la siguiente llamada se aplica la regla \code{<{}<EOF>{}>} general y el ciclo termina tras un único error (Figura~\ref{fig:abierto}).
+
+\captura{bug_loop.png}{Con la regla original: \texttt{printf 'x /* sin cerrar' | timeout 2 ./scanner | head} mostrando [ERROR:] repetido. Con la corrección: un solo [ERROR:].}{Ciclo infinito en el estado \code{COMMENT}, antes y después de la corrección.}{fig:loop}
+
+Por la misma razón, el estado \code{COMMENT} necesita \code{<COMMENT>\textbackslash n} además de \code{<COMMENT>.}. Sin esa regla, los saltos de línea no coincidirían con nada y Flex los copiaría a la salida (\code{ECHO}). Además, no se usa ningún patrón que acepte la cadena vacía, porque eso provocaría un ciclo sin consumir caracteres.
+
+\subsection{Otros casos frontera}
+
+\begin{itemize}
+  \item \textbf{Comentarios dentro de cadenas.} Una cadena que contiene \code{/*} o \code{//} sigue siendo un solo \code{STRING\_LITERAL}: la regla de cadena reconoce todo desde la comilla y Flex no reanaliza el interior de un lexema.
+  \item \textbf{Números.} \code{1.2.3} produce \code{FLOAT(1.2) ERROR(.) INT(3)}; \code{1e} produce \code{INT(1) ID(e)}, porque Flex retrocede a la última regla aceptada; \code{.5} produce \code{ERROR(.) INT(5)}.
+  \item \textbf{CRLF.} Sin \code{\textbackslash r} en \code{WS}, cada línea de un archivo editado en Windows terminaría en un \code{[ERROR:]} aparentemente vacío.
+\end{itemize}
+
+% ==================================================================
+\section{Limitaciones conocidas y deuda técnica}
+
+\begin{itemize}
+  \item \textbf{UTF-8.} Flex trabaja byte por byte: \code{ñ} produce dos \code{[ERROR:...]} con bytes sueltos. No hay identificadores con acentos; sí se aceptan dentro de cadenas y comentarios.
+  \item \textbf{Literales numéricos.} Hay notación científica, pero no hexadecimales (\code{0x1F} da \code{INT(0) ID(x1F)}), octales, \code{.5} ni sufijos. \code{123abc} se acepta como dos tokens en lugar de reportarse como error.
+  \item \textbf{Operadores de bits.} Faltan \code{\textasciicircum} y \code{\textasciitilde} (hoy son \code{ERROR}) y las asignaciones \code{<{}<=}, \code{\&=}, etc.
+  \item \textbf{Comentarios anidados.} \code{/* a /* b */ c */} cierra en el primer \code{*/}; requeriría un contador de profundidad.
+  \item \textbf{Escapes.} No se decodifican ni se validan (\code{\textbackslash q} se acepta). Tampoco hay cadenas multilínea.
+  \item \textbf{Ubicación de errores.} Aunque \code{yylineno} está activo, no se imprime la línea; el comentario sin cerrar se reporta con lexema vacío.
+  \item \textbf{Indentación y preprocesador.} No se emiten \code{INDENT}/\code{DEDENT} (el lenguaje usa llaves) ni se procesan directivas \code{\#include}; esto requeriría pila de niveles y búferes múltiples en \code{scanner.c}.
+\end{itemize}
+
+% ==================================================================
+\section{Validación en clase}
+
+\begin{figure}[H]
+  \centering
+  \IfFileExists{figuras/validacion.jpg}{%
+    \includegraphics[width=0.75\textwidth,height=0.7\textheight,keepaspectratio]{validacion.jpg}%
+  }{%
+    \fbox{\parbox[c][11cm][c]{0.7\textwidth}{\centering
+      \textbf{FOTOGRAFÍA DEL EJERCICIO VALIDADO EN CLASE}\\[0.5em]
+      \footnotesize\ttfamily (figuras/validacion.jpg)}}%
+  }
+  \caption*{Validación: Luis Manuel Reyes Colín}
+\end{figure}
+
+% ==================================================================
+\section{Evaluación de la práctica}
+
+Escala: 1. Totalmente en desacuerdo, 2. En desacuerdo, 3. Neutral, 4. De acuerdo, 5. Totalmente de acuerdo.
+
+\evaluacion{Luis}%
+  {{}{*}{}{}{}}%
+  {{}{}{*}{}{}}%
+  {{}{}{*}{}{}}%
+  {{}{}{*}{}{}}%
+  {{}{}{*}{}{}}%
+  {{}{}{*}{}{}}
+
+% Para los demás integrantes, copiar el bloque anterior y poner * en la columna elegida.
+
+\end{document}

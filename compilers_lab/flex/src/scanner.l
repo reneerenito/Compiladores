@@ -17,7 +17,7 @@ WS          [ \t\r\n]+
 <COMMENT>"*/"           { BEGIN(INITIAL); }
 <COMMENT>\n             { /* yylineno se actualiza automáticamente */ }
 <COMMENT>.              { /* descartar contenido de comentario */ }
-<COMMENT><<EOF>>        { return TOK_ERROR; }
+<COMMENT><<EOF>>        { BEGIN(INITIAL); return TOK_ERROR; }
 
 "//"[^\n]*              { /* comentario de línea */ }
 
@@ -86,8 +86,9 @@ WS          [ \t\r\n]+
 
 {FLOAT}                 { return TOK_FLOAT_LITERAL; }
 {INT}                   { return TOK_INT_LITERAL; }
-\'([^\\\n]|\\.)\'       { return TOK_CHAR_LITERAL; }
-\"([^\\\n]|\\.)*\"      { return TOK_STRING_LITERAL; }
+\'([^'\\\n]|\\.)\'      { return TOK_CHAR_LITERAL; }
+\"([^"\\\n]|\\.)*\"     { return TOK_STRING_LITERAL; }
+\"([^"\\\n]|\\.)*       { return TOK_ERROR; /* cadena sin cerrar */ }
 {ID}                    { return TOK_IDENTIFIER; }
 
 <<EOF>>                 { return TOK_EOF; }
