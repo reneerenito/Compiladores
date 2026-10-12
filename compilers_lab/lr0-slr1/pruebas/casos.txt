@@ -1,0 +1,21 @@
+# Una prueba por línea: primero ACEPTA o RECHAZA, luego el código.
+# Las líneas que empiezan con # se ignoran.
+
+# Válidas
+ACEPTA   len :: [Int] -> Int ;
+ACEPTA   suma :: Int -> Int -> Int ; suma a b = a + b ;
+ACEPTA   inc x = x + 1 ;
+ACEPTA   y = a + b * c ;
+ACEPTA   m = f (x + 1) y ;
+ACEPTA   f x y = if x < y then x else y ;
+ACEPTA   g = \x -> x * 2 ;
+ACEPTA   h = let a = 1 ; in [a, b + 2] ;
+ACEPTA   ok = a < b || c == d && e ;
+
+# Inválidas
+RECHAZA  f = x + ;
+RECHAZA  f x = x
+RECHAZA  f = if x then y ;
+RECHAZA  f = a == b == c ;
+RECHAZA  f = (x + 1 ;
+RECHAZA  = x ;
