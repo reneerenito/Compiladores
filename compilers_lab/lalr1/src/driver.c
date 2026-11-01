@@ -1,83 +1,143 @@
-/* Motor LALR(1): una pila de estados y otra, en paralelo, con el nodo del AST
-   de cada símbolo (NULL para los terminales que no generan nodo). */
+/* El motor del parser LALR(1). Es el mismo ciclo shift/reduce que el del SLR(1);
+ * lo único que cambia es la tabla ACCION, que ya trae los lookaheads exactos.
+ *
+ * Usa tres pilas que suben y bajan juntas:
+ *   estados   los números de estado del autómata
+ *   simbolos  los nombres de los símbolos (solo para mostrar la traza)
+ *   valores   los pedazos de árbol que se van armando
+ *
+ * En cada paso mira el estado de arriba y el token actual, y busca en ACCION:
+ *   shift   mete el token y el nuevo estado, y avanza en la entrada
+ *   reduce  saca tantos elementos como mide la regla, mete el no terminal
+ *           y el estado que diga IR_A, y arma el nodo del árbol
+ *   ACC     la cadena es válida
+ *   ER      la cadena tiene un error
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "driver.h"
 #include "gramatica.h"
 #include "tabla.h"
 
-/* Hace la acción semántica de la producción k y regresa el nodo resultante.
-   nodos apunta al primer símbolo de la parte derecha. */
-static Nodo *reducir_nodo(int k, Nodo **nodos)
-{
-    switch (k) {
-    case 2: return nodo_asignacion(nodos[0], nodos[2]); /* S -> L = R */
-    case 4: return nodo_deref(nodos[1]);                /* L -> * R   */
-    default: return nodos[0];                           /* S -> R, L -> id (nodo ya creado), R -> L */
-    }
+static void mostrar_paso(int paso, const int *estados, const char **simbolos,
+                         int tope, const Token *tokens, int n, int i,
+                         const char *accion) {
+  char pila[2048] = "", entrada[2048] = "", pedazo[64];
+
+  snprintf(pila, sizeof pila, "%d", estados[0]);
+  for (int k = 1; k <= tope; k++) {
+    snprintf(pedazo, sizeof pedazo, " %s %d", simbolos[k], estados[k]);
+    strncat(pila, pedazo, sizeof pila - strlen(pila) - 1);
+  }
+  for (int k = i; k < n; k++) {
+    strncat(entrada, TERMINALES[tokens[k].tipo],
+            sizeof entrada - strlen(entrada) - 1);
+    strncat(entrada, " ", sizeof entrada - strlen(entrada) - 1);
+  }
+  strncat(entrada, "$", sizeof entrada - strlen(entrada) - 1);
+
+  printf("%4d  %-45s %35s   %s\n", paso, pila, entrada, accion);
 }
 
-int analizar(const Token *tokens, int n, int traza, Nodo **ast, char *error, size_t tam)
-{
-    int *estados = malloc((n + 2) * sizeof(int));
-    Nodo **nodos = malloc((n + 2) * sizeof(Nodo *));
-    int tope = 0, i = 0, resultado = -1;
-    estados[0] = 0;
-    nodos[0] = NULL;
-    *ast = NULL;
+static void armar_error(Resultado *r, int estado, const Token *tokens, int n,
+                        int i) {
+  char esperados[256] = "";
+  for (int t = 0; t < NUM_TERMINALES; t++) {
+    if (ACCION[estado][t] != ER) {
+      if (esperados[0] != '\0')
+        strcat(esperados, ", ");
+      strcat(esperados, TERMINALES[t]);
+    }
+  }
+  if (i >= n)
+    snprintf(r->error, sizeof r->error,
+             "Error en el fin de la entrada: en el estado I%d se esperaba uno "
+             "de: %s",
+             estado, esperados);
+  else
+    snprintf(
+        r->error, sizeof r->error,
+        "Error en el token #%d '%s': en el estado I%d se esperaba uno de: %s",
+        i + 1, tokens[i].lexema, estado, esperados);
+}
 
-    for (;;) {
-        int estado = estados[tope];
-        int tipo = i < n ? tokens[i].tipo : FIN;
-        int accion = ACCION[estado][tipo];
+Resultado analizar(const Token *tokens, int n, Acciones acciones, int traza) {
+  Resultado r = {0, NULL, ""};
 
-        if (traza)
-            printf("estado %d, token %s -> ", estado, TERMINALES[tipo]);
+  /* La pila nunca crece más que el número de tokens + 2,
+     porque toda regla tiene al menos un símbolo a la derecha. */
+  int *estados = malloc((n + 2) * sizeof(int));
+  const char **simbolos = malloc((n + 2) * sizeof(char *));
+  Nodo **valores = malloc((n + 2) * sizeof(Nodo *));
+  int tope = 0;
+  estados[0] = 0;
 
-        if (accion == ER) {
-            if (i < n)
-                snprintf(error, tam, "error sintáctico en el token #%d '%s' (estado %d)", i + 1, tokens[i].lexema, estado);
-            else
-                snprintf(error, tam, "error sintáctico: la cadena terminó antes de tiempo (estado %d)", estado);
-            if (traza)
-                printf("error\n");
-            break;
-        }
+  int i = 0, paso = 0;
+  char accion[160];
 
-        if (accion == ACC) {
-            if (traza)
-                printf("aceptar\n");
-            *ast = nodos[tope];
-            resultado = 0;
-            break;
-        }
+  if (traza)
+    printf("%4s  %-45s %35s   %s\n", "Paso", "Pila", "Entrada", "Acción");
 
-        if (accion > 0) { /* shift */
-            if (traza)
-                printf("shift %d\n", accion);
-            tope++;
-            estados[tope] = accion;
-            nodos[tope] = tipo == T_ID ? nodo_id(tokens[i].lexema) : NULL;
-            i++;
-        } else { /* reduce */
-            int k = -accion;
-            int largo = PRODUCCIONES[k].largo;
-            if (traza)
-                printf("reduce %s\n", PRODUCCIONES[k].texto);
-            Nodo *nodo = reducir_nodo(k, &nodos[tope - largo + 1]);
-            tope -= largo;
-            tope++;
-            estados[tope] = IR_A[estados[tope - 1]][PRODUCCIONES[k].izq];
-            nodos[tope] = nodo;
-        }
+  for (;;) {
+    int estado = estados[tope];
+    int token = i < n ? tokens[i].tipo : FIN;
+    int celda = ACCION[estado][token];
+    paso++;
+
+    if (celda == ER) {
+      if (traza)
+        mostrar_paso(paso, estados, simbolos, tope, tokens, n, i, "ERROR");
+      armar_error(&r, estado, tokens, n, i);
+      break;
     }
 
-    if (resultado != 0)
-        for (int j = 1; j <= tope; j++)
-            ast_liberar(nodos[j]);
-    free(estados);
-    free(nodos);
-    return resultado;
+    if (celda == ACC) {
+      if (traza)
+        mostrar_paso(paso, estados, simbolos, tope, tokens, n, i, "aceptar");
+      r.aceptada = 1;
+      r.arbol = valores[tope];
+      break;
+    }
+
+    if (celda > 0) { /* shift */
+      if (traza) {
+        snprintf(accion, sizeof accion, "shift %d", celda);
+        mostrar_paso(paso, estados, simbolos, tope, tokens, n, i, accion);
+      }
+      tope++;
+      estados[tope] = celda;
+      simbolos[tope] = TERMINALES[token];
+      valores[tope] = acciones.hoja(&tokens[i]);
+      i++;
+      continue;
+    }
+
+    /* reduce con la regla k */
+    int k = -celda;
+    const Produccion *p = &PRODUCCIONES[k];
+    tope -= p->largo; /* sacamos el lado derecho */
+    Nodo *nuevo = acciones.reducir(k, &valores[tope + 1]);
+    int siguiente = IR_A[estados[tope]][p->izq];
+
+    if (traza) {
+      snprintf(accion, sizeof accion, "reduce r%d (%s), ir_a[%d,%s] = %d", k,
+               p->texto, estados[tope], NO_TERMINALES[p->izq], siguiente);
+      /* mostramos la pila como estaba antes de reducir */
+      mostrar_paso(paso, estados, simbolos, tope + p->largo, tokens, n, i,
+                   accion);
+    }
+
+    tope++;
+    estados[tope] = siguiente;
+    simbolos[tope] = NO_TERMINALES[p->izq];
+    valores[tope] = nuevo;
+  }
+
+  free(estados);
+  free(simbolos);
+  free(valores);
+  return r;
 }

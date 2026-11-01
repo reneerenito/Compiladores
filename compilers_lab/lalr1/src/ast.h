@@ -1,21 +1,25 @@
 #ifndef AST_H
 #define AST_H
 
-typedef enum { N_ASIGNACION, N_DEREF, N_ID } TipoNodo;
+#include "lexer.h"
 
 typedef struct Nodo {
-    TipoNodo tipo;
-    char lexema[64]; /* solo para N_ID */
-    struct Nodo *izq; /* N_ASIGNACION: lado izquierdo. N_DEREF: el operando */
-    struct Nodo *der; /* N_ASIGNACION: lado derecho */
+    char *etiqueta;
+    struct Nodo **hijos;
+    int num_hijos;
+    int capacidad;
 } Nodo;
 
-Nodo *nodo_id(const char *lexema);
-Nodo *nodo_deref(Nodo *operando);
-Nodo *nodo_asignacion(Nodo *izq, Nodo *der);
+/* Lo que hace el parser cada vez que lee un token (hoja) o reduce una regla. */
+typedef struct {
+    Nodo *(*hoja)(const Token *t);
+    Nodo *(*reducir)(int k, Nodo **hijos);
+} Acciones;
 
-/* Imprime el árbol en texto y libera toda su memoria */
-void ast_imprimir(const Nodo *n);
-void ast_liberar(Nodo *n);
+extern const Acciones ACCIONES_AST;         /* arma el AST limpio */
+extern const Acciones ACCIONES_DERIVACION;  /* arma el árbol con todas las reglas */
+
+void imprimir_arbol(const Nodo *raiz);
+void liberar_nodos(void);   /* borra todos los nodos creados hasta ahora */
 
 #endif

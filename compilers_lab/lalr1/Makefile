@@ -1,8 +1,10 @@
-CC = gcc
-CFLAGS = -Wall -Wextra -std=c99
+CC     = cc
+CFLAGS = -std=c99 -Wall -Wextra -O2
 
-lalr1: src/main.c src/driver.c src/ast.c src/lexer.c src/tabla.c src/gramatica.c
-	$(CC) $(CFLAGS) -o $@ $^
+parser: src/main.c src/driver.c src/ast.c src/lexer.c src/gramatica.c src/tabla.c src/*.h
+	$(CC) $(CFLAGS) -o parser src/main.c src/driver.c src/ast.c src/lexer.c src/gramatica.c src/tabla.c
 
 clean:
-	rm -f lalr1
+	rm -f parser
+
+.PHONY: clean
