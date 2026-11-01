@@ -7,4 +7,7 @@ parser: src/main.c src/driver.c src/ast.c src/lexer.c src/gramatica.c src/tabla.
 clean:
 	rm -f parser
 
-.PHONY: clean
+test: parser
+	bash correr_pruebas.sh
+
+.PHONY: clean test
